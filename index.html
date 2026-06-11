@@ -3,647 +3,498 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Smart Bookmarks (Gist Sync + Edit Toggle)</title>
+  <title>Bookmarks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --bg: #0b0c10;
-      --card: #15171f;
-      --text: #e8eaf0;
-      --muted: #a6adbb;
-      --ring: #6aa3ff;
-      --shadow: 0 10px 25px rgba(0,0,0,.25);
-      --radius: 18px;
-      --accent1: rgba(90,120,255,.35);
-      --accent2: rgba(0,200,170,.35);
+    :root {
+      --bg: #0e0f12;
+      --bg-elevated: #16181e;
+      --surface: #1c1f27;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-hover: rgba(255, 255, 255, 0.14);
+      --text: #eef0f4;
+      --muted: #8b93a7;
+      --accent: #e8a849;
+      --accent-soft: rgba(232, 168, 73, 0.14);
+      --ring: rgba(232, 168, 73, 0.45);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 40px rgba(0, 0, 0, 0.28);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --font: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "DM Serif Display", Georgia, serif;
     }
+
     @media (prefers-color-scheme: light) {
-      :root{
-        --bg: #f6f7fb;
-        --card: #ffffff;
-        --text: #121519;
-        --muted: #5b6473;
-        --ring: #3a7bff;
-        --shadow: 0 8px 20px rgba(0,0,0,.08);
+      :root {
+        --bg: #f3f1ec;
+        --bg-elevated: #eae7e0;
+        --surface: #ffffff;
+        --border: rgba(20, 22, 28, 0.08);
+        --border-hover: rgba(20, 22, 28, 0.16);
+        --text: #14161c;
+        --muted: #5c6370;
+        --accent: #b8741a;
+        --accent-soft: rgba(184, 116, 26, 0.1);
+        --ring: rgba(184, 116, 26, 0.35);
+        --shadow: 0 1px 2px rgba(20, 22, 28, 0.04), 0 10px 32px rgba(20, 22, 28, 0.08);
       }
     }
 
-    * { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; }
+
     html, body { min-height: 100%; }
-    body{
+
+    body {
       margin: 0;
-      font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      font: 16px/1.55 var(--font);
       color: var(--text);
-      background: radial-gradient(1200px 800px at 20% -10%, rgba(90,120,255,.18), transparent 60%),
-                  radial-gradient(1000px 700px at 120% 120%, rgba(0,200,170,.12), transparent 60%),
-                  var(--bg);
-      background-repeat: no-repeat, no-repeat, no-repeat;
-/*       background-attachment: fixed, fixed, fixed; */
+      background:
+        radial-gradient(900px 500px at 10% -5%, rgba(232, 168, 73, 0.12), transparent 55%),
+        radial-gradient(700px 420px at 95% 0%, rgba(120, 140, 200, 0.08), transparent 50%),
+        var(--bg);
     }
 
-    .container{ max-width: 1100px; margin: 48px auto; padding: 0 20px; }
-    .page-header h1{ margin: 0 0 6px; font-size: clamp(28px, 3.2vw, 38px); letter-spacing: -0.02em; }
-    .subtitle{ margin: 0 16px 18px 0; color: var(--muted); }
-
-    /* Toolbar */
-    .toolbar{ display: flex; gap: 10px; align-items: center; margin: 12px 0 28px; flex-wrap: wrap; }
-    .btn{ padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: linear-gradient(135deg, var(--accent1), var(--accent2)); color: var(--text); cursor: pointer; font-weight: 600; box-shadow: var(--shadow); }
-    .btn.secondary{ background: transparent; }
-    .btn.toggled{ outline: 3px solid color-mix(in oklab, var(--ring) 60%, transparent); }
-
-    /* Search bar */
-    .search-bar{ display: flex; gap: 10px; align-items: center; margin: 12px 0 28px; }
-    .search-bar input[type="search"]{
-      flex: 1 1 420px; background: var(--card); color: var(--text);
-      border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius);
-      padding: 12px 14px; font-size: 16px; box-shadow: var(--shadow);
+    .page {
+      width: min(920px, 100%);
+      margin: 0 auto;
+      padding: clamp(32px, 6vw, 72px) 20px 64px;
     }
-    .search-bar input::placeholder{ color: var(--muted); }
-    .search-bar button{
-      flex: 0 0 auto; padding: 12px 16px; border: 1px solid rgba(255,255,255,.12);
+
+    .hero {
+      margin-bottom: 40px;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font: 400 clamp(2rem, 4vw, 2.75rem)/1.05 var(--font-display);
+      letter-spacing: -0.02em;
+    }
+
+    .clock {
+      text-align: right;
+      color: var(--muted);
+      font-size: 0.875rem;
+      line-height: 1.35;
+    }
+
+    .clock time {
+      display: block;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .search-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .search-row input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
       border-radius: var(--radius);
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      color: var(--text); font-weight: 600; cursor: pointer; box-shadow: var(--shadow);
-      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      box-shadow: var(--shadow);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
-    .search-bar button:hover{ transform: translateY(-1px); box-shadow: 0 14px 30px rgba(0,0,0,.28); border-color: rgba(90,120,255,.35); }
 
-    .section-title{ margin: 22px 0 10px; font-size: clamp(18px, 2.2vw, 22px); color: var(--muted); font-weight: 700; letter-spacing: .02em; display: flex; align-items: center; gap: 8px; }
-    .section-controls{ display: none; gap: 6px; }
-    .edit-mode .section-controls{ display: inline-flex; }
+    .search-row input::placeholder { color: var(--muted); }
 
-    .bookmarks{ display: flex; flex-wrap: wrap; gap: 16px; }
-
-    .bookmark, .add-tile{
-      flex: 1 1 240px; max-width: 340px; display: flex; align-items: center; gap: 14px;
-      padding: 16px 18px; text-decoration: none; background: var(--card); color: var(--text);
-      border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.06);
-      transform: translateZ(0); transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-      position: relative;
+    .search-row input:focus {
+      outline: none;
+      border-color: var(--ring);
+      box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow);
     }
-    .bookmark:hover, .add-tile:hover{ transform: translateY(-2px); box-shadow: 0 14px 30px rgba(0,0,0,.28); border-color: rgba(90,120,255,.35); }
-    .bookmark:focus, .add-tile:focus{ outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 60%, transparent), var(--shadow); }
 
-    .initials{
-      width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; font-weight: 700; letter-spacing: .02em;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2)); border: 1px solid rgba(255,255,255,.08); flex: 0 0 40px;
+    .search-row button {
+      flex: 0 0 auto;
+      padding: 0 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--accent-soft);
+      color: var(--text);
+      font: 600 0.9375rem var(--font);
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
     }
-    .title{ font-size: 16px; font-weight: 600; letter-spacing: .01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* Edit button */
-    .edit-btn{
-      position: absolute; top: 8px; right: 8px; border: none; background: transparent; color: var(--muted);
-      cursor: pointer; font-size: 18px; line-height: 1; padding: 6px; border-radius: 10px; display: none;
+    .search-row button:hover {
+      border-color: var(--border-hover);
+      background: color-mix(in srgb, var(--accent-soft) 70%, var(--accent) 30%);
     }
-    .edit-mode .edit-btn{ display: inline-block; }
-    .edit-btn:hover{ background: rgba(255,255,255,.06); color: var(--text); }
 
-    /* Add tile (big plus) */
-    .add-tile{ justify-content: center; gap: 10px; cursor: pointer; display: none; }
-    .edit-mode .add-tile{ display: flex; }
-    .plus{ width: 40px; height: 40px; border-radius: 10px; border: 1px dashed rgba(255,255,255,.18); display: grid; place-items: center; font-size: 24px; }
+    .filter-hint {
+      margin: 0;
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
 
-    /* Modal */
-    dialog.modal{ width: min(560px, 92vw); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 0; background: var(--card); color: var(--text); box-shadow: 0 30px 60px rgba(0,0,0,.35); }
-    .modal header{ padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; justify-content: space-between; align-items: center; }
-    .modal header h3{ margin: 0; font-size: 18px; }
-    .modal form{ padding: 16px 18px 20px; display: grid; gap: 12px; }
-    .row{ display: grid; grid-template-columns: 1fr 2fr; gap: 10px; align-items: center; }
-    .row label{ color: var(--muted); }
-    .row input, .row select{ width: 100%; background: #0f1117; color: var(--text); border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: 10px 12px; }
-    .form-actions{ margin-top: 8px; display: flex; gap: 10px; justify-content: flex-end; }
-    .btn.danger{ background: #7c1f2b; border-color: #7c1f2b; }
+    .filter-hint kbd {
+      display: inline-block;
+      padding: 1px 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-elevated);
+      font: 600 0.75rem ui-monospace, monospace;
+    }
 
-    .help{ color: var(--muted); font-size: 13px; }
+    .sections { display: grid; gap: 36px; }
 
-    .sr-only{ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 14px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font: 600 0.8125rem var(--font);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .section-header::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .bookmarks {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .bookmark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 58px;
+      padding: 12px 14px;
+      text-decoration: none;
+      color: inherit;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+    }
+
+    .bookmark:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+
+    .bookmark:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--ring), var(--shadow);
+    }
+
+    .bookmark[hidden] { display: none; }
+
+    .icon {
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-sm);
+      font: 700 0.75rem var(--font);
+      letter-spacing: 0.03em;
+      color: var(--text);
+      background: var(--accent-soft);
+      border: 1px solid var(--border);
+    }
+
+    .bookmark-meta {
+      min-width: 0;
+      display: grid;
+      gap: 2px;
+    }
+
+    .bookmark-title {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bookmark-url {
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .empty-state {
+      display: none;
+      margin-top: 24px;
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .empty-state.visible { display: block; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
 
     @media (prefers-reduced-motion: reduce) {
-      .bookmark, .add-tile, .search-bar button, .btn { transition: none; }
-      .bookmark:hover, .add-tile:hover, .search-bar button:hover { transform: none; }
+      .bookmark, .search-row button { transition: none; }
+      .bookmark:hover { transform: none; }
     }
   </style>
 </head>
 <body>
-  <main class="container">
-    <header class="page-header">
-      <h1>Bookmarks</h1>
-      <p class="subtitle">Cross-device sync. Edit on your terms.</p>
-
-      <div class="toolbar">
-        <button id="editToggle" class="btn secondary" type="button" aria-pressed="false" aria-label="Toggle edit mode">✏️ Edit</button>
-        <button id="settingsBtn" class="btn secondary" type="button" aria-label="Open settings">⚙️ Settings & Sync</button>
+  <main class="page">
+    <header class="hero">
+      <div class="hero-top">
+        <h1>Bookmarks</h1>
+        <div class="clock" aria-live="polite">
+          <time id="clockTime"></time>
+          <span id="clockDate"></span>
+        </div>
       </div>
 
-      <!-- Embedded Google search -->
-      <form class="search-bar" action="https://www.google.com/search" method="get" role="search" aria-label="Google search">
-        <label class="sr-only" for="q">Search Google</label>
-        <input id="q" name="q" type="search" placeholder="Search Google…" autocomplete="off" />
-        <button type="submit" aria-label="Search">Search</button>
-      </form>
+      <div class="search-stack">
+        <form class="search-row" action="https://www.google.com/search" method="get" role="search" aria-label="Google search">
+          <label class="sr-only" for="google-q">Search Google</label>
+          <input id="google-q" name="q" type="search" placeholder="Search the web…" autocomplete="off" autofocus />
+          <button type="submit">Go</button>
+        </form>
+
+        <form class="search-row" role="search" aria-label="Filter bookmarks" onsubmit="return false">
+          <label class="sr-only" for="filter-q">Filter bookmarks</label>
+          <input id="filter-q" type="search" placeholder="Filter bookmarks…" autocomplete="off" spellcheck="false" />
+        </form>
+
+        <p class="filter-hint">Press <kbd>/</kbd> to filter bookmarks.</p>
+      </div>
     </header>
 
-    <!-- Sections will be rendered here -->
-    <div id="sections"></div>
+    <div id="sections" class="sections"></div>
+    <p id="emptyState" class="empty-state" hidden>No bookmarks match your filter.</p>
   </main>
 
-  <!-- Add/Edit Modal -->
-  <dialog class="modal" id="bookmarkModal">
-    <header>
-      <h3 id="modalTitle">Add Bookmark</h3>
-      <button class="btn secondary" type="button" id="closeModal" aria-label="Close">Close</button>
-    </header>
-    <form id="bookmarkForm" method="dialog">
-      <input type="hidden" id="editId" />
-      <input type="hidden" id="editSectionIndex" />
-      <div class="row">
-        <label for="title">Title</label>
-        <input id="title" name="title" required placeholder="e.g., ChatGPT" />
-      </div>
-      <div class="row">
-        <label for="url">Link</label>
-        <input id="url" name="url" type="url" required placeholder="https://…" />
-      </div>
-      <div class="row">
-        <label for="initials">Initials</label>
-        <input id="initials" name="initials" maxlength="3" placeholder="e.g., CG" />
-      </div>
-      <div class="row">
-        <label for="section">Section</label>
-        <select id="section" name="section"></select>
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn danger" id="deleteBtn" hidden>Delete</button>
-        <button type="button" class="btn secondary" id="cancelBtn">Cancel</button>
-        <button type="submit" class="btn" id="saveBtn">Save</button>
-      </div>
-    </form>
-  </dialog>
-
-  <!-- Settings / Sync Modal -->
-  <dialog class="modal" id="settingsModal">
-    <header>
-      <h3>Settings & Sync (GitHub Gist)</h3>
-      <button class="btn secondary" type="button" id="closeSettings" aria-label="Close">Close</button>
-    </header>
-    <form id="settingsForm" method="dialog">
-      <div class="row">
-        <label for="token">GitHub Token</label>
-        <input id="token" name="token" type="password" placeholder="ghp_… (gist scope)" />
-      </div>
-      <div class="row">
-        <label for="gistId">Gist ID</label>
-        <input id="gistId" name="gistId" placeholder="e.g., a1b2c3d4…" />
-      </div>
-      <div class="row">
-        <label for="filename">Filename</label>
-        <input id="filename" name="filename" placeholder="bookmarks.json" />
-      </div>
-      <div class="row">
-        <label for="autosync">Auto Sync</label>
-        <input id="autosync" name="autosync" type="checkbox" />
-      </div>
-      <p class="help">
-        Auto Sync = pull on load & push after edits. Your token stays on this device (localStorage).
-      </p>
-      <div class="form-actions">
-        <button type="button" class="btn secondary" id="pullBtn">Pull from Gist</button>
-        <button type="button" class="btn" id="pushBtn">Push to Gist</button>
-      </div>
-    </form>
-  </dialog>
-
   <script>
-    // =======================
-    // Data & Persistence
-    // =======================
-
-    const initialState = {
+    // Edit this object when adding or removing bookmarks.
+    const BOOKMARKS = {
       sections: [
-        { name: 'AI Tools', items: [
-          { id: crypto.randomUUID(), title: 'ChatGPT', url: 'https://chat.openai.com', initials: 'CG' },
-          { id: crypto.randomUUID(), title: 'NotebookLM', url: 'https://notebooklm.google', initials: 'NL' }
-        ]}
+        {
+          name: "Essentials",
+          items: [
+            { title: "WhatsApp", url: "https://web.whatsapp.com/", initials: "WA" },
+            { title: "TickTick", url: "https://ticktick.com/webapp", initials: "TT" },
+            { title: "Mail", url: "https://mail.google.com/mail/u/1/#inbox", initials: "GM" },
+            { title: "Calendar", url: "https://calendar.google.com/calendar/u/0/r", initials: "GC" },
+            { title: "Moodle", url: "https://estudijas.rcmc.lv/my/", initials: "Mo" },
+            { title: "RCMC Schedule", url: "https://docs.google.com/spreadsheets/d/1GeRD0aCphKXZEywLJZirqP8gGHzqxLSkCZW9rWNUAoc/edit?gid=325603477#gid=325603477", initials: "RS" }
+          ]
+        },
+        {
+          name: "Office",
+          items: [
+            { title: "Notion", url: "https://www.notion.so", initials: "N" },
+            { title: "Drive", url: "https://drive.google.com/drive/u/4/", initials: "GD" },
+            { title: "OneDrive", url: "https://onedrive.live.com/", initials: "OD" },
+            { title: "Keep", url: "https://keep.google.com/u/0/#label/Quotes", initials: "K" },
+            { title: "Whimsical", url: "https://whimsical.com/", initials: "W" },
+            { title: "ILovePDF", url: "https://www.ilovepdf.com/", initials: "LP" }
+          ]
+        },
+        {
+          name: "AI",
+          items: [
+            { title: "ChatGPT", url: "https://chat.openai.com", initials: "CG" },
+            { title: "Gemini", url: "https://gemini.google.com/app", initials: "Ge" },
+            { title: "NotebookLM", url: "https://notebooklm.google.com/", initials: "NL" },
+            { title: "OpenRouter", url: "https://openrouter.ai/", initials: "OR" }
+          ]
+        },
+        {
+          name: "Research",
+          items: [
+            { title: "PubMed", url: "https://pubmed.ncbi.nlm.nih.gov/", initials: "PM" },
+            { title: "Biblioteca UMFCD", url: "http://ezproxy.medgrid.eu/menu", initials: "UM" },
+            { title: "ResearchRabbit AI", url: "https://app.researchrabbit.ai/", initials: "RR" },
+            { title: "Rayyan", url: "https://new.rayyan.ai/reviews", initials: "RY" },
+            { title: "SciSpace AI", url: "https://scispace.com/", initials: "SS" },
+            { title: "Elicit AI", url: "https://elicit.com/", initials: "EL" },
+            { title: "Consensus", url: "https://consensus.app/", initials: "CS" }
+          ]
+        },
+        {
+          name: "Media",
+          items: [
+            { title: "YouTube", url: "https://www.youtube.com/", initials: "YT" },
+            { title: "Plex", url: "https://app.plex.tv/", initials: "P" },
+            { title: "Netflix", url: "https://www.netflix.com/browse", initials: "NF" }
+          ]
+        },
+        {
+          name: "Tools & Shopping",
+          items: [
+            { title: "Tinkercad", url: "https://www.tinkercad.com/dashboard", initials: "TK" },
+            { title: "Gumroad", url: "https://gumroad.com/", initials: "GR" },
+            { title: "gg.deals", url: "https://gg.deals/", initials: "gD" },
+            { title: "Hornbach", url: "https://www.hornbach.ro/", initials: "HB" },
+            { title: "Open-Slum", url: "https://open-slum.org/", initials: "OS" }
+          ]
+        }
       ]
     };
 
-    const LS_STATE_KEY = 'smart-bookmarks-state-v2';   // local cache (for speed/offline)
-    const LS_EDIT_KEY  = 'smart-bookmarks-editmode';
-    const LS_SYNC_KEY  = 'smart-bookmarks-sync';       // gist config
+    const sectionsRoot = document.getElementById("sections");
+    const filterInput = document.getElementById("filter-q");
+    const emptyState = document.getElementById("emptyState");
+    const clockTime = document.getElementById("clockTime");
+    const clockDate = document.getElementById("clockDate");
 
-    function migrate(obj){
-      if(!obj) return null;
-      if(obj.sections) return obj; // already new format
-      const sections = Object.keys(obj).map(name => ({ name, items: obj[name] }));
-      return { sections };
+    function deriveInitials(title) {
+      if (!title) return "??";
+      const words = title.trim().split(/\s+/);
+      const chars = (words[0][0] || "").toUpperCase() + (words[1]?.[0] || "").toUpperCase();
+      return chars || title.slice(0, 2).toUpperCase();
     }
 
-    function loadState(){
-      try{
-        const raw = localStorage.getItem(LS_STATE_KEY);
-        if(!raw){ return structuredClone(initialState); }
-        const parsed = JSON.parse(raw);
-        return migrate(parsed) || structuredClone(initialState);
-      }catch(e){
-        console.warn('Failed to load state, using defaults', e);
-        return structuredClone(initialState);
+    function displayHost(url) {
+      try {
+        return new URL(url).hostname.replace(/^www\./, "");
+      } catch {
+        return url;
       }
     }
 
-    // Auto-push debouncer
-    let pushTimer = null;
-    function debouncePush(fn){
-      if(pushTimer) clearTimeout(pushTimer);
-      pushTimer = setTimeout(fn, 800);
+    function cssSafe(value) {
+      return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     }
 
-    let state = loadState();
-
-    // =======================
-    // Edit Mode
-    // =======================
-    const body = document.body;
-    let editMode = localStorage.getItem(LS_EDIT_KEY) === '1';
-
-    function setEditMode(on){
-      editMode = !!on;
-      localStorage.setItem(LS_EDIT_KEY, on ? '1' : '0');
-      body.classList.toggle('edit-mode', on);
-      editToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
-      editToggle.classList.toggle('toggled', on);
-      render();
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = String(str);
+      return div.innerHTML;
     }
 
-    // =======================
-    // Rendering
-    // =======================
-    const sectionsRoot = document.getElementById('sections');
+    function renderSections() {
+      sectionsRoot.innerHTML = "";
 
-    function render(){
-      sectionsRoot.innerHTML = '';
-      state.sections.forEach((section, idx) => {
-        const sectionEl = document.createElement('section');
-        sectionEl.setAttribute('aria-labelledby', `sec-${cssSafe(section.name)}`);
+      BOOKMARKS.sections.forEach((section) => {
+        const sectionEl = document.createElement("section");
+        sectionEl.dataset.section = cssSafe(section.name);
 
-        const header = document.createElement('h2');
-        header.id = `sec-${cssSafe(section.name)}`;
-        header.className = 'section-title';
-        header.innerHTML = `
-          <span class="section-name">${escapeHtml(section.name)}</span>
-          <span class="section-controls">
-            <button class="btn secondary" type="button" data-action="rename">Rename</button>
-            <button class="btn secondary" type="button" data-action="up">▲</button>
-            <button class="btn secondary" type="button" data-action="down">▼</button>
-          </span>
-        `;
+        const header = document.createElement("div");
+        header.className = "section-header";
+        header.innerHTML = `<h2 id="sec-${cssSafe(section.name)}">${escapeHtml(section.name)}</h2>`;
         sectionEl.appendChild(header);
 
-        header.querySelector('[data-action="rename"]').addEventListener('click', ()=> renameSection(idx));
-        header.querySelector('[data-action="up"]').addEventListener('click', ()=> moveSection(idx, -1));
-        header.querySelector('[data-action="down"]').addEventListener('click', ()=> moveSection(idx, +1));
+        const list = document.createElement("div");
+        list.className = "bookmarks";
+        list.setAttribute("role", "list");
 
-        const listEl = document.createElement('div');
-        listEl.className = 'bookmarks';
+        section.items.forEach((item) => {
+          const link = document.createElement("a");
+          link.className = "bookmark";
+          link.href = item.url;
+          link.rel = "noopener noreferrer";
+          link.setAttribute("role", "listitem");
+          link.dataset.title = item.title.toLowerCase();
+          link.dataset.host = displayHost(item.url).toLowerCase();
+          link.innerHTML = `
+            <span class="icon" aria-hidden="true">${escapeHtml(item.initials || deriveInitials(item.title))}</span>
+            <span class="bookmark-meta">
+              <span class="bookmark-title">${escapeHtml(item.title)}</span>
+              <span class="bookmark-url">${escapeHtml(displayHost(item.url))}</span>
+            </span>
+          `;
+          list.appendChild(link);
+        });
 
-        section.items.forEach(b => listEl.appendChild(renderBookmark(b, idx)));
-        listEl.appendChild(renderAddTile(idx));
-
-        sectionEl.appendChild(listEl);
+        sectionEl.appendChild(list);
         sectionsRoot.appendChild(sectionEl);
       });
     }
 
-    function renderBookmark(bm, sectionIndex){
-      const a = document.createElement('a');
-      a.className = 'bookmark';
-      a.href = bm.url; a.target = ''; a.rel = 'noopener noreferrer';
-      a.innerHTML = `
-        <span class="initials" aria-hidden="true">${escapeHtml(bm.initials || deriveInitials(bm.title))}</span>
-        <span class="title">${escapeHtml(bm.title)}</span>
-        <button class="edit-btn" title="Edit" aria-label="Edit bookmark">✏️</button>
-      `;
-      a.querySelector('.edit-btn').addEventListener('click', (e)=>{
-        e.preventDefault(); e.stopPropagation();
-        openBookmarkModal({ mode: 'edit', sectionIndex, bookmark: bm });
-      });
-      return a;
-    }
+    function applyFilter(query) {
+      const term = query.trim().toLowerCase();
+      let visibleCount = 0;
 
-    function renderAddTile(sectionIndex){
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'add-tile';
-      btn.setAttribute('aria-label', 'Add bookmark to section ' + state.sections[sectionIndex].name);
-      btn.innerHTML = '<div class="plus">+</div><span class="title">Add bookmark</span>';
-      btn.addEventListener('click', ()=> openBookmarkModal({ mode: 'add', sectionIndex }));
-      return btn;
-    }
+      sectionsRoot.querySelectorAll("section").forEach((section) => {
+        let sectionVisible = 0;
 
-    function renameSection(idx){
-      const current = state.sections[idx].name;
-      const name = prompt('Rename section:', current);
-      if(!name) return;
-      const clean = name.trim();
-      if(!clean) return;
-      state.sections[idx].name = clean;
-      saveState(state);
-      render();
-    }
-
-    function moveSection(idx, delta){
-      const newIdx = idx + delta;
-      if(newIdx < 0 || newIdx >= state.sections.length) return;
-      const sec = state.sections.splice(idx,1)[0];
-      state.sections.splice(newIdx,0,sec);
-      saveState(state);
-      render();
-    }
-
-    // =======================
-    // Bookmark Modal Logic
-    // =======================
-    const bookmarkModal = document.getElementById('bookmarkModal');
-    const form = document.getElementById('bookmarkForm');
-    const modalTitle = document.getElementById('modalTitle');
-    const closeModalBtn = document.getElementById('closeModal');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const deleteBtn = document.getElementById('deleteBtn');
-
-    const titleInput = document.getElementById('title');
-    const urlInput = document.getElementById('url');
-    const initialsInput = document.getElementById('initials');
-    const sectionSelect = document.getElementById('section');
-    const editIdInput = document.getElementById('editId');
-    const editSectionIndexInput = document.getElementById('editSectionIndex');
-
-    function populateSectionSelect(preselectIndex){
-      sectionSelect.innerHTML = '';
-      state.sections.forEach((s, i)=>{
-        const opt = document.createElement('option');
-        opt.value = String(i); opt.textContent = s.name; sectionSelect.appendChild(opt);
-      });
-      const divider = document.createElement('option'); divider.disabled = true; divider.textContent = '──────────';
-      const create = document.createElement('option'); create.value = '__new__'; create.textContent = '➕ Create new section…';
-      sectionSelect.appendChild(divider); sectionSelect.appendChild(create);
-      sectionSelect.value = preselectIndex != null ? String(preselectIndex) : '0';
-    }
-
-    sectionSelect.addEventListener('change', ()=>{
-      if(sectionSelect.value === '__new__'){
-        const name = prompt('New section name:');
-        if(name && name.trim()){
-          const clean = name.trim();
-          state.sections.push({ name: clean, items: [] });
-          populateSectionSelect(state.sections.length - 1);
-        } else {
-          populateSectionSelect(0);
-        }
-      }
-    });
-
-    function openBookmarkModal({ mode, sectionIndex, bookmark }){
-      populateSectionSelect(sectionIndex);
-      if(mode === 'add'){
-        modalTitle.textContent = 'Add Bookmark';
-        editIdInput.value = '';
-        editSectionIndexInput.value = sectionIndex;
-        form.reset();
-        deleteBtn.hidden = true;
-      } else {
-        modalTitle.textContent = 'Edit Bookmark';
-        editIdInput.value = bookmark.id;
-        editSectionIndexInput.value = sectionIndex;
-        titleInput.value = bookmark.title;
-        urlInput.value = bookmark.url;
-        initialsInput.value = bookmark.initials || deriveInitials(bookmark.title);
-        sectionSelect.value = String(sectionIndex);
-        deleteBtn.hidden = false;
-        deleteBtn.dataset.sectionIndex = String(sectionIndex);
-      }
-      bookmarkModal.showModal();
-      setTimeout(()=> titleInput.focus(), 10);
-    }
-
-    function closeBookmarkModal(){ bookmarkModal.close(); }
-
-    closeModalBtn.addEventListener('click', closeBookmarkModal);
-    cancelBtn.addEventListener('click', closeBookmarkModal);
-
-    deleteBtn.addEventListener('click', ()=>{
-      const id = editIdInput.value; if(!id) return;
-      const secIdx = Number(deleteBtn.dataset.sectionIndex);
-      state.sections[secIdx].items = state.sections[secIdx].items.filter(b => b.id !== id);
-      saveState(state);
-      render();
-      closeBookmarkModal();
-    });
-
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const payload = {
-        title: titleInput.value.trim(),
-        url: urlInput.value.trim(),
-        initials: (initialsInput.value || deriveInitials(titleInput.value)).toUpperCase().slice(0,3),
-      };
-      let destSectionIdx = sectionSelect.value === '__new__' ? null : Number(sectionSelect.value);
-
-      const editingId = editIdInput.value;
-      const originalSectionIdx = Number(editSectionIndexInput.value);
-
-      if(editingId){
-        const srcItems = state.sections[originalSectionIdx].items;
-        const idx = srcItems.findIndex(b => b.id === editingId);
-        if(idx !== -1){
-          const updated = { ...srcItems[idx], ...payload };
-          srcItems.splice(idx,1);
-          if(destSectionIdx == null){
-            const name = prompt('New section name:');
-            if(!name || !name.trim()){ saveState(state); render(); closeBookmarkModal(); return; }
-            state.sections.push({ name: name.trim(), items: [] });
-            destSectionIdx = state.sections.length - 1;
-          }
-          state.sections[destSectionIdx].items.push(updated);
-        }
-      } else {
-        if(destSectionIdx == null){
-          const name = prompt('New section name:');
-          if(!name || !name.trim()){ return; }
-          state.sections.push({ name: name.trim(), items: [] });
-          destSectionIdx = state.sections.length - 1;
-        }
-        state.sections[destSectionIdx].items.push({ id: crypto.randomUUID(), ...payload });
-      }
-
-      saveState(state);
-      render();
-      closeBookmarkModal();
-    });
-
-    // =======================
-    // Settings & Sync (GitHub Gist)
-    // =======================
-    const settingsModal = document.getElementById('settingsModal');
-    const settingsBtn = document.getElementById('settingsBtn');
-    const closeSettingsBtn = document.getElementById('closeSettings');
-    const settingsForm = document.getElementById('settingsForm');
-    const tokenInput = document.getElementById('token');
-    const gistIdInput = document.getElementById('gistId');
-    const filenameInput = document.getElementById('filename');
-    const autoSyncInput = document.getElementById('autosync');
-    const pullBtn = document.getElementById('pullBtn');
-    const pushBtn = document.getElementById('pushBtn');
-
-    function loadSync(){
-      try{
-        const v = JSON.parse(localStorage.getItem(LS_SYNC_KEY)) || { token: '', gistId: '', filename: 'bookmarks.json', auto: false };
-        if (typeof v.auto === 'undefined') v.auto = false;
-        return v;
-      }catch{
-        return { token: '', gistId: '', filename: 'bookmarks.json', auto: false };
-      }
-    }
-    function saveSync(cfg){ localStorage.setItem(LS_SYNC_KEY, JSON.stringify(cfg)); }
-
-    let syncCfg = loadSync();
-
-    function openSettings(){
-      tokenInput.value = syncCfg.token || '';
-      gistIdInput.value = syncCfg.gistId || '';
-      filenameInput.value = syncCfg.filename || 'bookmarks.json';
-      autoSyncInput.checked = !!syncCfg.auto;
-      settingsModal.showModal();
-    }
-    function closeSettings(){ settingsModal.close(); }
-
-    settingsBtn.addEventListener('click', openSettings);
-    closeSettingsBtn.addEventListener('click', closeSettings);
-
-    settingsForm.addEventListener('input', ()=>{
-      syncCfg = {
-        token: tokenInput.value,
-        gistId: gistIdInput.value,
-        filename: filenameInput.value || 'bookmarks.json',
-        auto: !!autoSyncInput.checked
-      };
-      saveSync(syncCfg);
-    });
-
-    pullBtn.addEventListener('click', async ()=>{
-      try{
-        const remote = await gistGet(syncCfg);
-        state = remote; localStorage.setItem(LS_STATE_KEY, JSON.stringify(state));
-        render();
-        alert('Pulled bookmarks from Gist.');
-      }catch(err){
-        console.error(err); alert('Pull failed: ' + (err && err.message ? err.message : err));
-      }
-    });
-
-    pushBtn.addEventListener('click', async ()=>{
-      try{
-        await gistPut(syncCfg, state);
-        alert('Pushed bookmarks to Gist.');
-      }catch(err){
-        console.error(err); alert('Push failed: ' + (err && err.message ? err.message : err));
-      }
-    });
-
-    async function gistGet(cfg){
-      requireSyncCfg(cfg);
-      const res = await fetch('https://api.github.com/gists/' + encodeURIComponent(cfg.gistId), {
-        headers: {
-          'Accept': 'application/vnd.github+json',
-          'Authorization': cfg.token ? 'token ' + cfg.token : ''
-        }
-      });
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      const gist = await res.json();
-      const file = gist.files[cfg.filename];
-      if(!file) throw new Error('Filename not found in Gist');
-      if(file.truncated && file.raw_url){
-        const raw = await fetch(file.raw_url);
-        if(!raw.ok) throw new Error('Raw fetch HTTP ' + raw.status);
-        return parseMaybeMigrate(await raw.text());
-      }
-      return parseMaybeMigrate(file.content);
-    }
-
-    async function gistPut(cfg, currentState){
-      requireSyncCfg(cfg);
-      const body = { files: { } };
-      body.files[cfg.filename] = { content: JSON.stringify(currentState, null, 2) };
-      const res = await fetch('https://api.github.com/gists/' + encodeURIComponent(cfg.gistId), {
-        method: 'PATCH',
-        headers: {
-          'Accept': 'application/vnd.github+json',
-          'Content-Type': 'application/json',
-          'Authorization': cfg.token ? 'token ' + cfg.token : ''
-        },
-        body: JSON.stringify(body)
-      });
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    }
-
-    function requireSyncCfg(cfg){
-      if(!cfg || !cfg.gistId || !cfg.filename){ throw new Error('Set Gist ID and filename in Settings.'); }
-      // token optional for reading public gists; required for writing/private gists
-    }
-
-    function parseMaybeMigrate(text){
-      let obj = JSON.parse(text);
-      obj = migrate(obj) || obj;
-      if(!obj.sections) throw new Error('Invalid data format');
-      return obj;
-    }
-
-    // Save wrapper with optional auto-push
-    function saveState(s){
-      localStorage.setItem(LS_STATE_KEY, JSON.stringify(s));
-      if (syncCfg.auto && syncCfg.gistId) {
-        debouncePush(async () => {
-          try { await gistPut(syncCfg, state); }
-          catch(e){ console.warn('Auto-push failed:', e); }
+        section.querySelectorAll(".bookmark").forEach((link) => {
+          const matches = !term
+            || link.dataset.title.includes(term)
+            || link.dataset.host.includes(term);
+          link.hidden = !matches;
+          if (matches) sectionVisible += 1;
         });
-      }
+
+        section.hidden = sectionVisible === 0;
+        visibleCount += sectionVisible;
+      });
+
+      emptyState.hidden = visibleCount > 0;
+      emptyState.classList.toggle("visible", visibleCount === 0 && term.length > 0);
     }
 
-    // =======================
-    // Utilities
-    // =======================
-    function deriveInitials(title){
-      if(!title) return '??';
-      const words = title.trim().split(/\s+/);
-      const chars = (words[0][0] || '').toUpperCase() + (words[1]?.[0] || '').toUpperCase();
-      return chars || title.slice(0,2).toUpperCase();
+    function updateClock() {
+      const now = new Date();
+      clockTime.textContent = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      clockDate.textContent = now.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
     }
-    function cssSafe(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
-    function escapeHtml(str){ const div = document.createElement('div'); div.textContent = String(str); return div.innerHTML; }
 
-    // =======================
-    // Init
-    // =======================
-    const editToggle = document.getElementById('editToggle');
-    editToggle.addEventListener('click', ()=> setEditMode(!editMode));
-    setEditMode(editMode);
-    render();
+    filterInput.addEventListener("input", () => applyFilter(filterInput.value));
 
-    // Auto-pull on load if configured
-    (async () => {
-      try {
-        if (syncCfg.auto && syncCfg.gistId) {
-          const remote = await gistGet(syncCfg);
-          state = remote; localStorage.setItem(LS_STATE_KEY, JSON.stringify(state));
-          render();
-        }
-      } catch (e) {
-        console.warn('Auto-pull failed:', e);
-      }
-    })();
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+      const tag = document.activeElement?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      event.preventDefault();
+      filterInput.focus();
+    });
+
+    renderSections();
+    updateClock();
+    setInterval(updateClock, 30_000);
   </script>
 </body>
 </html>
-
-
-
-
-
