@@ -147,6 +147,22 @@ body {
   font-size: 1rem;
 }
 
+.btn.edit-toggle.toggled,
+.btn.edit-toggle[aria-pressed="true"] {
+  background: var(--accent);
+  color: #14161c;
+  border-color: transparent;
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow);
+}
+
+@media (prefers-color-scheme: light) {
+  .btn.edit-toggle.toggled,
+  .btn.edit-toggle[aria-pressed="true"] {
+    color: #fff;
+  }
+}
+
 .account {
   display: inline-flex;
   align-items: center;
@@ -204,11 +220,6 @@ body {
 
 .menu-item:hover {
   background: var(--accent-soft);
-}
-
-.menu-item.toggled {
-  outline: 2px solid var(--ring);
-  outline-offset: -2px;
 }
 
 .menu-item.danger {
@@ -367,6 +378,51 @@ body {
 
 .bookmark[hidden] { display: none; }
 
+.edit-mode .bookmark {
+  padding-right: 42px;
+}
+
+.bookmark-actions {
+  display: none;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.edit-mode .bookmark-actions {
+  display: flex;
+}
+
+.bookmark-actions .action-btn {
+  width: 26px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  color: var(--muted);
+  font-size: 0.65rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bookmark-actions .action-btn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+.bookmark-actions .action-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.bookmark-actions .edit-btn {
+  height: 24px;
+  font-size: 0.8rem;
+}
+
 .icon,
 .plus {
   flex: 0 0 36px;
@@ -410,25 +466,6 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.edit-btn {
-  display: none;
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  border: none;
-  background: var(--bg-elevated);
-  color: var(--muted);
-  border-radius: 8px;
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  line-height: 1;
-}
-
-.edit-mode .edit-btn { display: grid; place-items: center; }
-.edit-btn:hover { color: var(--text); }
 
 .add-tile {
   display: none;

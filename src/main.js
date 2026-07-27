@@ -241,8 +241,8 @@ function render() {
     list.className = "bookmarks";
     list.setAttribute("role", "list");
 
-    section.items.forEach((item) => {
-      list.appendChild(renderBookmark(item, sectionIndex));
+    section.items.forEach((item, itemIndex) => {
+      list.appendChild(renderBookmark(item, sectionIndex, itemIndex));
     });
     list.appendChild(renderAddTile(sectionIndex));
 
@@ -253,7 +253,8 @@ function render() {
   applyFilter(filterQuery);
 }
 
-function renderBookmark(item, sectionIndex) {
+function renderBookmark(item, sectionIndex, itemIndex) {
+  const items = state.sections[sectionIndex].items;
   const link = document.createElement("a");
   link.className = "bookmark";
   link.href = item.url;
@@ -267,9 +268,24 @@ function renderBookmark(item, sectionIndex) {
       <span class="bookmark-title">${escapeHtml(item.title)}</span>
       <span class="bookmark-url">${escapeHtml(displayHost(item.url))}</span>
     </span>
-    <button type="button" class="edit-btn" title="Edit" aria-label="Edit bookmark">✎</button>
+    <span class="bookmark-actions">
+      <button type="button" class="action-btn" data-action="up" title="Move up" aria-label="Move bookmark up" ${itemIndex === 0 ? "disabled" : ""}>▲</button>
+      <button type="button" class="action-btn" data-action="down" title="Move down" aria-label="Move bookmark down" ${itemIndex >= items.length - 1 ? "disabled" : ""}>▼</button>
+      <button type="button" class="action-btn edit-btn" data-action="edit" title="Edit" aria-label="Edit bookmark">✎</button>
+    </span>
   `;
-  link.querySelector(".edit-btn").addEventListener("click", (event) => {
+
+  link.querySelector('[data-action="up"]').addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    moveBookmark(sectionIndex, itemIndex, -1);
+  });
+  link.querySelector('[data-action="down"]').addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    moveBookmark(sectionIndex, itemIndex, 1);
+  });
+  link.querySelector('[data-action="edit"]').addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
     openBookmarkModal({ mode: "edit", sectionIndex, bookmark: item });
@@ -382,6 +398,17 @@ async function moveSection(index, delta) {
   await persistState(state);
 }
 
+async function moveBookmark(sectionIndex, itemIndex, delta) {
+  const items = state.sections[sectionIndex].items;
+  const next = itemIndex + delta;
+  if (next < 0 || next >= items.length) return;
+  const copy = items.slice();
+  const [item] = copy.splice(itemIndex, 1);
+  copy.splice(next, 0, item);
+  state.sections[sectionIndex].items = copy;
+  await persistState(state);
+}
+
 async function deleteSection(index) {
   const section = state.sections[index];
   const count = section.items.length;
@@ -465,7 +492,6 @@ addSectionBtn.addEventListener("click", async () => {
 
 editToggle.addEventListener("click", () => {
   setEditMode(!editMode);
-  closeSettingsMenu();
 });
 
 settingsBtn.addEventListener("click", (event) => {

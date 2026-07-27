@@ -19,6 +19,7 @@
             <span id="clockDate"></span>
           </div>
           <nav class="nav" id="toolbar" aria-label="Account">
+            <button type="button" class="btn icon-btn edit-toggle" id="editToggle" hidden aria-pressed="false" aria-label="Toggle edit mode" title="Edit">✎</button>
             <div class="menu" id="settingsMenu">
               <button type="button" class="btn icon-btn" id="settingsBtn" aria-label="Settings" aria-haspopup="menu" aria-expanded="false" aria-controls="settingsPanel">⚙</button>
               <div class="menu-panel" id="settingsPanel" role="menu" hidden>
@@ -27,7 +28,6 @@
                 </div>
                 <button type="button" class="menu-item" id="signInBtn" role="menuitem">Sign in</button>
                 <button type="button" class="menu-item" id="signOutBtn" role="menuitem" hidden>Sign out</button>
-                <button type="button" class="menu-item" id="editToggle" role="menuitem" hidden aria-pressed="false">Edit</button>
                 <button type="button" class="menu-item" id="exportBtn" role="menuitem" hidden>Export</button>
                 <button type="button" class="menu-item" id="importBtn" role="menuitem" hidden>Import</button>
                 <button type="button" class="menu-item danger" id="resetBtn" role="menuitem" hidden>Reset</button>
