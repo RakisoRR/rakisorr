@@ -1,24 +1,27 @@
 ---
-description: Commit meaningful changes automatically without asking
+description: Commit and push meaningful changes automatically without asking
 alwaysApply: true
 ---
 
-# Automatic commits
+# Automatic commits and pushes
 
-When you finish a coherent unit of work that changes project files, **commit it yourself** without asking for permission.
+When you finish a coherent unit of work that changes project files, **commit and push** yourself without asking for permission.
 
-## When to commit
+## When to commit and push
 
 - After completing a feature, fix, refactor, or docs update the user asked for
 - After a batch of related edits that leave the repo in a good state
 - Prefer small, focused commits over one giant dump at the end of a long session
+- After a successful commit on the current branch, **push to the tracked remote** (`git push`)
 
-## When not to commit
+## When not to commit or push
 
 - Mid-debug with broken/incomplete changes
 - Secrets or local-only files (`.env`, credentials, tokens)
 - Trivial WIP the user is still iterating on in the same turn (wait until the turn’s goal is done)
+- Never `git push --force` to main/master
+- Never push if there is nothing new to push
 
 ## How
 
-Follow the repo’s commit protocol: status + diff + log style, stage relevant files only, HEREDOC commit message focused on why, never amend unless the usual amend rules allow it, never push unless asked, never update git config.
+Follow the repo’s commit protocol: status + diff + log style, stage relevant files only, concise commit message focused on why, never amend unless the usual amend rules allow it, never update git config. After commit succeeds, push with the permissions needed for network/remote access.
