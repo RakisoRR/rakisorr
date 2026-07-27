@@ -109,10 +109,14 @@ function setEditMode(on) {
 
 function updateAuthChrome() {
   const signedIn = Boolean(user);
-  signInBtn.hidden = signedIn || !isSupabaseConfigured;
+  const configured = isSupabaseConfigured;
+  settingsMenu.hidden = !configured;
+  signInBtn.hidden = signedIn || !configured;
   signOutBtn.hidden = !signedIn;
   editToggle.hidden = !signedIn;
-  settingsMenu.hidden = !signedIn;
+  exportBtn.hidden = !signedIn;
+  importBtn.hidden = !signedIn;
+  resetBtn.hidden = !signedIn;
   accountEl.hidden = !signedIn;
   if (!signedIn) closeSettingsMenu();
 
@@ -459,7 +463,10 @@ addSectionBtn.addEventListener("click", async () => {
   await persistState(state);
 });
 
-editToggle.addEventListener("click", () => setEditMode(!editMode));
+editToggle.addEventListener("click", () => {
+  setEditMode(!editMode);
+  closeSettingsMenu();
+});
 
 settingsBtn.addEventListener("click", (event) => {
   event.stopPropagation();
@@ -507,7 +514,10 @@ resetBtn.addEventListener("click", async () => {
   await persistState(hydrateIds(cloneDefaults()));
 });
 
-signInBtn.addEventListener("click", () => openAuthModal("signin"));
+signInBtn.addEventListener("click", () => {
+  closeSettingsMenu();
+  openAuthModal("signin");
+});
 authTabSignIn.addEventListener("click", () => setAuthMode("signin"));
 authTabSignUp.addEventListener("click", () => setAuthMode("signup"));
 closeAuthModalBtn.addEventListener("click", closeAuthModal);
@@ -545,6 +555,7 @@ authForm.addEventListener("submit", async (event) => {
 });
 
 signOutBtn.addEventListener("click", async () => {
+  closeSettingsMenu();
   if (!supabase) return;
   await supabase.auth.signOut();
 });

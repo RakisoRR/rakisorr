@@ -168,7 +168,7 @@ body {
   top: calc(100% + 6px);
   right: 0;
   z-index: 20;
-  min-width: 140px;
+  min-width: 168px;
   padding: 6px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -176,6 +176,17 @@ body {
   box-shadow: var(--shadow);
   display: grid;
   gap: 2px;
+}
+
+.menu-account {
+  padding: 8px 10px 10px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .menu-item {
@@ -193,6 +204,11 @@ body {
 
 .menu-item:hover {
   background: var(--accent-soft);
+}
+
+.menu-item.toggled {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
 }
 
 .menu-item.danger {
