@@ -7,293 +7,34 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #0e0f12;
-      --bg-elevated: #16181e;
-      --surface: #1c1f27;
-      --border: rgba(255, 255, 255, 0.07);
-      --border-hover: rgba(255, 255, 255, 0.14);
-      --text: #eef0f4;
-      --muted: #8b93a7;
-      --accent: #e8a849;
-      --accent-soft: rgba(232, 168, 73, 0.14);
-      --ring: rgba(232, 168, 73, 0.45);
-      --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 40px rgba(0, 0, 0, 0.28);
-      --radius: 14px;
-      --radius-sm: 10px;
-      --font: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-      --font-display: "DM Serif Display", Georgia, serif;
-    }
-
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg: #f3f1ec;
-        --bg-elevated: #eae7e0;
-        --surface: #ffffff;
-        --border: rgba(20, 22, 28, 0.08);
-        --border-hover: rgba(20, 22, 28, 0.16);
-        --text: #14161c;
-        --muted: #5c6370;
-        --accent: #b8741a;
-        --accent-soft: rgba(184, 116, 26, 0.1);
-        --ring: rgba(184, 116, 26, 0.35);
-        --shadow: 0 1px 2px rgba(20, 22, 28, 0.04), 0 10px 32px rgba(20, 22, 28, 0.08);
-      }
-    }
-
-    *, *::before, *::after { box-sizing: border-box; }
-
-    html, body { min-height: 100%; }
-
-    body {
-      margin: 0;
-      font: 16px/1.55 var(--font);
-      color: var(--text);
-      background:
-        radial-gradient(900px 500px at 10% -5%, rgba(232, 168, 73, 0.12), transparent 55%),
-        radial-gradient(700px 420px at 95% 0%, rgba(120, 140, 200, 0.08), transparent 50%),
-        var(--bg);
-    }
-
-    .page {
-      width: min(920px, 100%);
-      margin: 0 auto;
-      padding: clamp(32px, 6vw, 72px) 20px 64px;
-    }
-
-    .hero {
-      margin-bottom: 40px;
-    }
-
-    .hero-top {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 28px;
-    }
-
-    .hero h1 {
-      margin: 0;
-      font: 400 clamp(2rem, 4vw, 2.75rem)/1.05 var(--font-display);
-      letter-spacing: -0.02em;
-    }
-
-    .clock {
-      text-align: right;
-      color: var(--muted);
-      font-size: 0.875rem;
-      line-height: 1.35;
-    }
-
-    .clock time {
-      display: block;
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .search-stack {
-      display: grid;
-      gap: 12px;
-    }
-
-    .search-row {
-      display: flex;
-      gap: 10px;
-      align-items: stretch;
-    }
-
-    .search-row input {
-      flex: 1;
-      min-width: 0;
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--surface);
-      color: var(--text);
-      font: inherit;
-      box-shadow: var(--shadow);
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .search-row input::placeholder { color: var(--muted); }
-
-    .search-row input:focus {
-      outline: none;
-      border-color: var(--ring);
-      box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow);
-    }
-
-    .search-row button {
-      flex: 0 0 auto;
-      padding: 0 18px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--accent-soft);
-      color: var(--text);
-      font: 600 0.9375rem var(--font);
-      cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-    }
-
-    .search-row button:hover {
-      border-color: var(--border-hover);
-      background: color-mix(in srgb, var(--accent-soft) 70%, var(--accent) 30%);
-    }
-
-    .filter-hint {
-      margin: 0;
-      font-size: 0.8125rem;
-      color: var(--muted);
-    }
-
-    .filter-hint kbd {
-      display: inline-block;
-      padding: 1px 6px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--bg-elevated);
-      font: 600 0.75rem ui-monospace, monospace;
-    }
-
-    .sections { display: grid; gap: 36px; }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 0 0 14px;
-    }
-
-    .section-header h2 {
-      margin: 0;
-      font: 600 0.8125rem var(--font);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .section-header::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .bookmarks {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 12px;
-    }
-
-    .bookmark {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-height: 58px;
-      padding: 12px 14px;
-      text-decoration: none;
-      color: inherit;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
-    }
-
-    .bookmark:hover {
-      border-color: var(--border-hover);
-      transform: translateY(-1px);
-    }
-
-    .bookmark:focus-visible {
-      outline: none;
-      box-shadow: 0 0 0 3px var(--ring), var(--shadow);
-    }
-
-    .bookmark[hidden] { display: none; }
-
-    .icon {
-      flex: 0 0 36px;
-      width: 36px;
-      height: 36px;
-      display: grid;
-      place-items: center;
-      border-radius: var(--radius-sm);
-      font: 700 0.75rem var(--font);
-      letter-spacing: 0.03em;
-      color: var(--text);
-      background: var(--accent-soft);
-      border: 1px solid var(--border);
-    }
-
-    .bookmark-meta {
-      min-width: 0;
-      display: grid;
-      gap: 2px;
-    }
-
-    .bookmark-title {
-      font-weight: 600;
-      font-size: 0.9375rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .bookmark-url {
-      font-size: 0.75rem;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .empty-state {
-      display: none;
-      margin-top: 24px;
-      padding: 20px;
-      text-align: center;
-      color: var(--muted);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-      background: var(--surface);
-    }
-
-    .empty-state.visible { display: block; }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .bookmark, .search-row button { transition: none; }
-      .bookmark:hover { transform: none; }
-    }
-  </style>
 </head>
 <body>
   <main class="page">
     <header class="hero">
       <div class="hero-top">
         <h1>Bookmarks</h1>
-        <div class="clock" aria-live="polite">
-          <time id="clockTime"></time>
-          <span id="clockDate"></span>
+        <div class="hero-aside">
+          <div class="clock" aria-live="polite">
+            <time id="clockTime"></time>
+            <span id="clockDate"></span>
+          </div>
         </div>
       </div>
+
+      <div class="toolbar" id="toolbar">
+        <button type="button" class="btn primary" id="signInBtn">Sign in</button>
+        <div class="account" id="account" hidden>
+          <span id="userEmail"></span>
+        </div>
+        <button type="button" class="btn" id="signOutBtn" hidden>Sign out</button>
+        <button type="button" class="btn" id="editToggle" hidden aria-pressed="false">Edit</button>
+        <button type="button" class="btn" id="exportBtn" hidden>Export</button>
+        <button type="button" class="btn" id="importBtn" hidden>Import</button>
+        <button type="button" class="btn" id="resetBtn" hidden>Reset</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden />
+      </div>
+
+      <p class="status-line" id="statusLine" aria-live="polite"></p>
 
       <div class="search-stack">
         <form class="search-row" action="https://www.google.com/search" method="get" role="search" aria-label="Google search">
@@ -307,196 +48,75 @@
           <input id="filter-q" type="search" placeholder="Filter bookmarks…" autocomplete="off" spellcheck="false" />
         </form>
 
-        <p class="filter-hint">Press <kbd>/</kbd> to filter bookmarks.</p>
+        <p class="filter-hint">Press <kbd>/</kbd> to filter bookmarks. Sign in to edit and sync across devices.</p>
       </div>
     </header>
 
     <div id="sections" class="sections"></div>
+    <div class="add-section-wrap">
+      <button type="button" class="btn primary" id="addSectionBtn">Add section</button>
+    </div>
     <p id="emptyState" class="empty-state" hidden>No bookmarks match your filter.</p>
   </main>
 
-  <script>
-    // Edit this object when adding or removing bookmarks.
-    const BOOKMARKS = {
-      sections: [
-        {
-          name: "Essentials",
-          items: [
-            { title: "WhatsApp", url: "https://web.whatsapp.com/", initials: "WA" },
-            { title: "TickTick", url: "https://ticktick.com/webapp", initials: "TT" },
-            { title: "Mail", url: "https://mail.google.com/mail/u/1/#inbox", initials: "GM" },
-            { title: "Calendar", url: "https://calendar.google.com/calendar/u/0/r", initials: "GC" },
-            { title: "Moodle", url: "https://estudijas.rcmc.lv/my/", initials: "Mo" },
-            { title: "RCMC Schedule", url: "https://docs.google.com/spreadsheets/d/1GeRD0aCphKXZEywLJZirqP8gGHzqxLSkCZW9rWNUAoc/edit?gid=325603477#gid=325603477", initials: "RS" }
-          ]
-        },
-        {
-          name: "Office",
-          items: [
-            { title: "Notion", url: "https://www.notion.so", initials: "N" },
-            { title: "Drive", url: "https://drive.google.com/drive/u/3/", initials: "GD" },
-            { title: "OneDrive", url: "https://onedrive.live.com/", initials: "OD" },
-            { title: "Keep", url: "https://keep.google.com/u/0/#label/Quotes", initials: "K" },
-            { title: "Whimsical", url: "https://whimsical.com/", initials: "W" },
-            { title: "Raindrop.io", url: "https://app.raindrop.io/my/38221770", initials: "RD" }
-          ]
-        },
-        {
-          name: "AI",
-          items: [
-            { title: "ChatGPT", url: "https://chat.openai.com", initials: "CG" },
-            { title: "Gemini", url: "https://gemini.google.com/app", initials: "Ge" },
-            { title: "NotebookLM", url: "https://notebooklm.google.com/", initials: "NL" },
-            { title: "OpenRouter", url: "https://openrouter.ai/", initials: "OR" }
-          ]
-        },
-        {
-          name: "Research",
-          items: [
-            { title: "PubMed", url: "https://pubmed.ncbi.nlm.nih.gov/", initials: "PM" },
-            { title: "Biblioteca UMFCD", url: "http://ezproxy.medgrid.eu/menu", initials: "UM" },
-            { title: "ResearchRabbit AI", url: "https://app.researchrabbit.ai/", initials: "RR" },
-            { title: "Rayyan", url: "https://new.rayyan.ai/reviews", initials: "RY" },
-            { title: "SciSpace AI", url: "https://scispace.com/", initials: "SS" },
-            { title: "Elicit AI", url: "https://elicit.com/", initials: "EL" },
-            { title: "Consensus", url: "https://consensus.app/", initials: "CS" }
-          ]
-        },
-        {
-          name: "Media",
-          items: [
-            { title: "YouTube", url: "https://www.youtube.com/", initials: "YT" },
-            { title: "Plex", url: "https://app.plex.tv/", initials: "P" },
-            { title: "Netflix", url: "https://www.netflix.com/browse", initials: "NF" }
-          ]
-        },
-        {
-          name: "Tools & Shopping",
-          items: [
-            { title: "Tinkercad", url: "https://www.tinkercad.com/dashboard", initials: "TK" },
-            { title: "MakerWorld", url: "https://makerworld.com/", initials: "MW" },
-            { title: "Printables", url: "https://www.printables.com/", initials: "Pr" },
-            { title: "Gumroad", url: "https://gumroad.com/", initials: "GR" },
-            { title: "gg.deals", url: "https://gg.deals/", initials: "gD" },
-            { title: "Hornbach", url: "https://www.hornbach.ro/", initials: "HB" },
-            { title: "Open-Slum", url: "https://open-slum.org/", initials: "OS" }
-          ]
-        }
-      ]
-    };
+  <dialog class="modal" id="authModal">
+    <header>
+      <h3 id="authModalTitle">Sign in</h3>
+      <button type="button" class="btn" id="closeAuthModal">Close</button>
+    </header>
+    <form id="authForm">
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="btn toggled" id="authTabSignIn" role="tab" aria-selected="true">Sign in</button>
+        <button type="button" class="btn" id="authTabSignUp" role="tab" aria-selected="false">Create account</button>
+      </div>
+      <div class="row">
+        <label for="authEmail">Email</label>
+        <input id="authEmail" name="email" type="email" required autocomplete="email" placeholder="you@example.com" />
+      </div>
+      <div class="row">
+        <label for="authPassword">Password</label>
+        <input id="authPassword" name="password" type="password" required autocomplete="current-password" minlength="6" placeholder="At least 6 characters" />
+      </div>
+      <p class="auth-message" id="authMessage" hidden></p>
+      <div class="form-actions">
+        <button type="button" class="btn" id="cancelAuthBtn">Cancel</button>
+        <button type="submit" class="btn primary" id="authSubmitBtn">Sign in</button>
+      </div>
+    </form>
+  </dialog>
 
-    const sectionsRoot = document.getElementById("sections");
-    const filterInput = document.getElementById("filter-q");
-    const emptyState = document.getElementById("emptyState");
-    const clockTime = document.getElementById("clockTime");
-    const clockDate = document.getElementById("clockDate");
+  <dialog class="modal" id="bookmarkModal">
+    <header>
+      <h3 id="modalTitle">Add bookmark</h3>
+      <button type="button" class="btn" id="closeModal">Close</button>
+    </header>
+    <form id="bookmarkForm">
+      <input type="hidden" id="editId" />
+      <input type="hidden" id="editSectionIndex" />
+      <div class="row">
+        <label for="title">Title</label>
+        <input id="title" name="title" required placeholder="e.g. ChatGPT" />
+      </div>
+      <div class="row">
+        <label for="url">Link</label>
+        <input id="url" name="url" type="url" required placeholder="https://…" />
+      </div>
+      <div class="row">
+        <label for="initials">Initials</label>
+        <input id="initials" name="initials" maxlength="3" placeholder="Auto" />
+      </div>
+      <div class="row">
+        <label for="section">Section</label>
+        <select id="section" name="section"></select>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn danger" id="deleteBtn" hidden>Delete</button>
+        <button type="button" class="btn" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn primary" id="saveBtn">Save</button>
+      </div>
+    </form>
+  </dialog>
 
-    function deriveInitials(title) {
-      if (!title) return "??";
-      const words = title.trim().split(/\s+/);
-      const chars = (words[0][0] || "").toUpperCase() + (words[1]?.[0] || "").toUpperCase();
-      return chars || title.slice(0, 2).toUpperCase();
-    }
-
-    function displayHost(url) {
-      try {
-        return new URL(url).hostname.replace(/^www\./, "");
-      } catch {
-        return url;
-      }
-    }
-
-    function cssSafe(value) {
-      return value.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-    }
-
-    function escapeHtml(str) {
-      const div = document.createElement("div");
-      div.textContent = String(str);
-      return div.innerHTML;
-    }
-
-    function renderSections() {
-      sectionsRoot.innerHTML = "";
-
-      BOOKMARKS.sections.forEach((section) => {
-        const sectionEl = document.createElement("section");
-        sectionEl.dataset.section = cssSafe(section.name);
-
-        const header = document.createElement("div");
-        header.className = "section-header";
-        header.innerHTML = `<h2 id="sec-${cssSafe(section.name)}">${escapeHtml(section.name)}</h2>`;
-        sectionEl.appendChild(header);
-
-        const list = document.createElement("div");
-        list.className = "bookmarks";
-        list.setAttribute("role", "list");
-
-        section.items.forEach((item) => {
-          const link = document.createElement("a");
-          link.className = "bookmark";
-          link.href = item.url;
-          link.rel = "noopener noreferrer";
-          link.setAttribute("role", "listitem");
-          link.dataset.title = item.title.toLowerCase();
-          link.dataset.host = displayHost(item.url).toLowerCase();
-          link.innerHTML = `
-            <span class="icon" aria-hidden="true">${escapeHtml(item.initials || deriveInitials(item.title))}</span>
-            <span class="bookmark-meta">
-              <span class="bookmark-title">${escapeHtml(item.title)}</span>
-              <span class="bookmark-url">${escapeHtml(displayHost(item.url))}</span>
-            </span>
-          `;
-          list.appendChild(link);
-        });
-
-        sectionEl.appendChild(list);
-        sectionsRoot.appendChild(sectionEl);
-      });
-    }
-
-    function applyFilter(query) {
-      const term = query.trim().toLowerCase();
-      let visibleCount = 0;
-
-      sectionsRoot.querySelectorAll("section").forEach((section) => {
-        let sectionVisible = 0;
-
-        section.querySelectorAll(".bookmark").forEach((link) => {
-          const matches = !term
-            || link.dataset.title.includes(term)
-            || link.dataset.host.includes(term);
-          link.hidden = !matches;
-          if (matches) sectionVisible += 1;
-        });
-
-        section.hidden = sectionVisible === 0;
-        visibleCount += sectionVisible;
-      });
-
-      emptyState.hidden = visibleCount > 0;
-      emptyState.classList.toggle("visible", visibleCount === 0 && term.length > 0);
-    }
-
-    function updateClock() {
-      const now = new Date();
-      clockTime.textContent = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-      clockDate.textContent = now.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
-    }
-
-    filterInput.addEventListener("input", () => applyFilter(filterInput.value));
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
-      const tag = document.activeElement?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
-      event.preventDefault();
-      filterInput.focus();
-    });
-
-    renderSections();
-    updateClock();
-    setInterval(updateClock, 30_000);
-  </script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 # Publication plan (for later)
 
-Status: **deferred** — do not implement until explicitly requested.
+Status: **deferred for public freemium** — personal email sign-in + sync editing is implemented (see [`SETUP.md`](SETUP.md)). Stripe / multi-user productization still deferred.
 
 Goal: turn this static start page into a public freemium product with personalized bookmarks that sync across devices.
 
@@ -11,7 +11,7 @@ Goal: turn this static start page into a public freemium product with personaliz
 | Frontend | Evolve `index.html` into a **Vite SPA** or thin **Next.js** app on **Vercel** | Easy deploys, previews, custom domain; SPA is enough for a start page |
 | Backend | Prefer **Supabase client + RLS** from the browser; add **Vercel Route Handlers / Serverless Functions** only for Stripe webhooks and secrets | Avoids a custom API for most CRUD |
 | Database | **Supabase Postgres** | Auth-integrated; RLS isolates each user’s rows |
-| Auth | **Supabase Auth** — **Google primary**, **GitHub secondary** | General public expects Google |
+| Auth | **Supabase Auth** — **email + password** (Google deferred for public launch if desired) | Simple accounts without OAuth app setup |
 | Payments | **Stripe Checkout** (subscription + optional lifetime later) | Freemium first; flip gates to paid-only if costs rise |
 
 **Cost reality:** Early public usage often fits free tiers (Vercel Hobby + Supabase Free). The first meaningful cliff is usually **Supabase Pro (~$25/mo)** if you outgrow free DB/auth limits — plan for Pro revenue to cover that, or tighten free caps / require Pro for sync.
@@ -36,7 +36,7 @@ flowchart LR
 ## Product model (freemium)
 
 **Free**
-- Sign in with Google or GitHub
+- Sign in with email + password
 - Sync bookmarks across devices
 - Cap: e.g. **80 bookmarks** and **8 sections** (tune later)
 - Default theme only
@@ -80,9 +80,9 @@ UI keeps the current start-page look (search, filter, clock, sections) plus a co
 - Privacy Policy + Terms stubs (required for OAuth + Stripe + public launch)
 
 ### Phase 1 — Auth + sync MVP
-- Create Supabase project; enable Google + GitHub providers
+- Create Supabase project; enable Email provider
 - SQL migrations for `profiles`, `sections`, `bookmarks` + RLS
-- Wire Supabase JS client: sign-in, session refresh, CRUD
+- Wire Supabase JS client: sign-up / sign-in, session refresh, CRUD
 - Cross-device verify: edit on PC A, refresh on PC B
 
 ### Phase 2 — Freemium + Stripe
@@ -113,7 +113,7 @@ UI keeps the current start-page look (search, filter, clock, sections) plus a co
 
 ## Success criteria
 
-- New user can Google-sign-in, add bookmarks, open another browser/PC, and see them
+- New user can create an email account, add bookmarks, open another browser/PC, and see them
 - Free user hits a clear upgrade path at the cap
 - Paying user unlocks unlimited via Stripe
 - Monthly infra bill stays ~$0 at early public scale (or is covered by Pro)
