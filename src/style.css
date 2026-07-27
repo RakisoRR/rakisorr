@@ -74,9 +74,10 @@ body {
 .hero-aside {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
   justify-content: flex-end;
+  margin-left: auto;
 }
 
 .clock {
@@ -94,12 +95,16 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.toolbar {
+.nav {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+}
+
+[hidden] {
+  display: none !important;
 }
 
 .btn {
@@ -134,12 +139,64 @@ body {
   border-color: color-mix(in srgb, var(--danger) 40%, var(--border));
 }
 
+.btn.icon-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+  font-size: 1rem;
+}
+
 .account {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-size: 0.8125rem;
   color: var(--muted);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu {
+  position: relative;
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  min-width: 140px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 2px;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: 600 0.8125rem var(--font);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: var(--accent-soft);
+}
+
+.menu-item.danger {
+  color: var(--danger);
 }
 
 .auth-tabs {
@@ -158,16 +215,7 @@ body {
   color: var(--danger);
 }
 
-.status-line {
-  margin: 0 0 12px;
-  min-height: 1.2em;
-  font-size: 0.8125rem;
-  color: var(--muted);
-}
-
-.status-line.error { color: var(--danger); }
-
-.search-stack { display: grid; gap: 12px; }
+.search-stack { display: grid; gap: 12px; margin-top: 8px; }
 
 .search-row {
   display: flex;

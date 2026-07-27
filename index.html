@@ -18,23 +18,25 @@
             <time id="clockTime"></time>
             <span id="clockDate"></span>
           </div>
+          <nav class="nav" id="toolbar" aria-label="Account">
+            <button type="button" class="btn primary" id="signInBtn">Sign in</button>
+            <div class="account" id="account" hidden>
+              <span id="userEmail"></span>
+            </div>
+            <button type="button" class="btn" id="editToggle" hidden aria-pressed="false">Edit</button>
+            <button type="button" class="btn" id="signOutBtn" hidden>Sign out</button>
+            <div class="menu" id="settingsMenu" hidden>
+              <button type="button" class="btn icon-btn" id="settingsBtn" aria-label="Settings" aria-haspopup="menu" aria-expanded="false" aria-controls="settingsPanel">⚙</button>
+              <div class="menu-panel" id="settingsPanel" role="menu" hidden>
+                <button type="button" class="menu-item" id="exportBtn" role="menuitem">Export</button>
+                <button type="button" class="menu-item" id="importBtn" role="menuitem">Import</button>
+                <button type="button" class="menu-item danger" id="resetBtn" role="menuitem">Reset</button>
+              </div>
+            </div>
+            <input type="file" id="importFile" accept="application/json,.json" hidden />
+          </nav>
         </div>
       </div>
-
-      <div class="toolbar" id="toolbar">
-        <button type="button" class="btn primary" id="signInBtn">Sign in</button>
-        <div class="account" id="account" hidden>
-          <span id="userEmail"></span>
-        </div>
-        <button type="button" class="btn" id="signOutBtn" hidden>Sign out</button>
-        <button type="button" class="btn" id="editToggle" hidden aria-pressed="false">Edit</button>
-        <button type="button" class="btn" id="exportBtn" hidden>Export</button>
-        <button type="button" class="btn" id="importBtn" hidden>Import</button>
-        <button type="button" class="btn" id="resetBtn" hidden>Reset</button>
-        <input type="file" id="importFile" accept="application/json,.json" hidden />
-      </div>
-
-      <p class="status-line" id="statusLine" aria-live="polite"></p>
 
       <div class="search-stack">
         <form class="search-row" action="https://www.google.com/search" method="get" role="search" aria-label="Google search">

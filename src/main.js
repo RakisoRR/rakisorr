@@ -11,10 +11,12 @@ const filterInput = document.getElementById("filter-q");
 const emptyState = document.getElementById("emptyState");
 const clockTime = document.getElementById("clockTime");
 const clockDate = document.getElementById("clockDate");
-const statusLine = document.getElementById("statusLine");
 const signInBtn = document.getElementById("signInBtn");
 const signOutBtn = document.getElementById("signOutBtn");
 const editToggle = document.getElementById("editToggle");
+const settingsMenu = document.getElementById("settingsMenu");
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsPanel = document.getElementById("settingsPanel");
 const exportBtn = document.getElementById("exportBtn");
 const importBtn = document.getElementById("importBtn");
 const resetBtn = document.getElementById("resetBtn");
@@ -54,11 +56,6 @@ let editMode = localStorage.getItem(LS_EDIT) === "1";
 let saving = false;
 let saveTimer = null;
 let authMode = "signin"; // signin | signup
-
-function setStatus(message, isError = false) {
-  statusLine.textContent = message || "";
-  statusLine.classList.toggle("error", Boolean(isError && message));
-}
 
 function deriveInitials(title) {
   if (!title) return "??";
@@ -115,20 +112,24 @@ function updateAuthChrome() {
   signInBtn.hidden = signedIn || !isSupabaseConfigured;
   signOutBtn.hidden = !signedIn;
   editToggle.hidden = !signedIn;
-  exportBtn.hidden = !signedIn;
-  importBtn.hidden = !signedIn;
-  resetBtn.hidden = !signedIn;
+  settingsMenu.hidden = !signedIn;
   accountEl.hidden = !signedIn;
+  if (!signedIn) closeSettingsMenu();
 
   if (signedIn) {
     userEmailEl.textContent = user.email || "Signed in";
   }
+}
 
-  if (!isSupabaseConfigured) {
-    setStatus("Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable sync.", true);
-  } else if (!signedIn) {
-    setStatus("Signed out — showing defaults. Sign in to edit and sync.");
-  }
+function closeSettingsMenu() {
+  settingsPanel.hidden = true;
+  settingsBtn.setAttribute("aria-expanded", "false");
+}
+
+function toggleSettingsMenu() {
+  const open = settingsPanel.hidden;
+  settingsPanel.hidden = !open;
+  settingsBtn.setAttribute("aria-expanded", open ? "true" : "false");
 }
 
 function setAuthMessage(message, isError = false) {
@@ -151,10 +152,7 @@ function setAuthMode(mode) {
 }
 
 function openAuthModal(mode = "signin") {
-  if (!supabase) {
-    setStatus("Supabase is not configured.", true);
-    return;
-  }
+  if (!supabase) return;
   setAuthMode(mode);
   authForm.reset();
   authModal.showModal();
@@ -174,16 +172,13 @@ async function persistState(nextState = state) {
   if (!user || !supabase) return;
 
   saving = true;
-  setStatus("Saving…");
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try {
       state = await replaceBookmarkTree(user.id, state);
       cacheState();
-      setStatus("Synced");
     } catch (err) {
       console.error(err);
-      setStatus(err.message || "Save failed", true);
     } finally {
       saving = false;
     }
@@ -193,15 +188,11 @@ async function persistState(nextState = state) {
 async function loadFromCloud() {
   if (!user || !supabase) return;
 
-  setStatus("Loading…");
   try {
     let tree = await fetchBookmarkTree(user.id);
     if (!tree.sections.length) {
       tree = hydrateIds(cloneDefaults());
       tree = await replaceBookmarkTree(user.id, tree);
-      setStatus("Seeded defaults — synced");
-    } else {
-      setStatus("Synced");
     }
     state = hydrateIds(tree);
     cacheState();
@@ -212,9 +203,6 @@ async function loadFromCloud() {
     if (cached) {
       state = cached;
       render();
-      setStatus("Offline cache — " + (err.message || "cloud load failed"), true);
-    } else {
-      setStatus(err.message || "Load failed", true);
     }
   }
 }
@@ -345,12 +333,14 @@ function populateSectionSelect(preselectIndex) {
 
 function openBookmarkModal({ mode, sectionIndex, bookmark }) {
   if (!user) return;
-  populateSectionSelect(sectionIndex);
   if (mode === "add") {
     modalTitle.textContent = "Add bookmark";
     editIdInput.value = "";
     editSectionIndexInput.value = String(sectionIndex);
-    bookmarkForm.reset();
+    titleInput.value = "";
+    urlInput.value = "";
+    initialsInput.value = "";
+    populateSectionSelect(sectionIndex);
     deleteBtn.hidden = true;
   } else {
     modalTitle.textContent = "Edit bookmark";
@@ -359,7 +349,7 @@ function openBookmarkModal({ mode, sectionIndex, bookmark }) {
     titleInput.value = bookmark.title;
     urlInput.value = bookmark.url;
     initialsInput.value = bookmark.initials || deriveInitials(bookmark.title);
-    sectionSelect.value = String(sectionIndex);
+    populateSectionSelect(sectionIndex);
     deleteBtn.hidden = false;
   }
   bookmarkModal.showModal();
@@ -471,7 +461,17 @@ addSectionBtn.addEventListener("click", async () => {
 
 editToggle.addEventListener("click", () => setEditMode(!editMode));
 
+settingsBtn.addEventListener("click", (event) => {
+  event.stopPropagation();
+  toggleSettingsMenu();
+});
+
+document.addEventListener("click", (event) => {
+  if (!settingsMenu.contains(event.target)) closeSettingsMenu();
+});
+
 exportBtn.addEventListener("click", () => {
+  closeSettingsMenu();
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -481,7 +481,10 @@ exportBtn.addEventListener("click", () => {
   URL.revokeObjectURL(url);
 });
 
-importBtn.addEventListener("click", () => importFile.click());
+importBtn.addEventListener("click", () => {
+  closeSettingsMenu();
+  importFile.click();
+});
 
 importFile.addEventListener("change", async () => {
   const file = importFile.files?.[0];
@@ -492,18 +495,16 @@ importFile.addEventListener("change", async () => {
     const parsed = JSON.parse(text);
     if (!parsed?.sections) throw new Error("Invalid bookmarks JSON");
     await persistState(hydrateIds(parsed));
-    setStatus("Imported and synced");
   } catch (err) {
     console.error(err);
-    setStatus(err.message || "Import failed", true);
   }
 });
 
 resetBtn.addEventListener("click", async () => {
+  closeSettingsMenu();
   if (!user) return;
   if (!confirm("Replace your cloud bookmarks with the built-in defaults?")) return;
   await persistState(hydrateIds(cloneDefaults()));
-  setStatus("Reset to defaults — synced");
 });
 
 signInBtn.addEventListener("click", () => openAuthModal("signin"));
@@ -527,7 +528,6 @@ authForm.addEventListener("submit", async (event) => {
       if (error) throw error;
       if (data.session) {
         closeAuthModal();
-        setStatus("Account created — synced");
       } else {
         setAuthMessage("Check your email to confirm your account, then sign in.");
       }
